@@ -23,7 +23,9 @@ class TestLogger
 
 describe 'AbstractLogger', ->
   log = TestLogger('test')
-  beforeEach ->TestLogger::_write.reset()
+  beforeEach ->
+    TestLogger::_write.reset()
+    log.level = 'error'
 
   describe '.constructor', ->
     it 'should get an instance', ->
@@ -34,6 +36,29 @@ describe 'AbstractLogger', ->
       result = TestLogger(name: 'test')
       expect(result).to.be.instanceOf TestLogger
       expect(result).to.have.property 'name', 'test'
+    it 'should customize log levels', ->
+      lvls = {}
+      result = TestLogger(name: 'test', levels:lvls)
+      expect(result.levels).to.be.equal lvls
+    it 'should init a log level', ->
+      result = TestLogger(name: 'test', level: 'notice')
+      expect(result.level).to.be.equal 'NOTICE'
+      expect(result._level).to.be.equal log.levels.NOTICE
+    it 'should disable a logger', ->
+      result = TestLogger(name: 'test', enabled: false)
+      expect(result.enabled).to.be.false
+      result.log 'his'
+      expect(TestLogger::_write).to.be.not.called
+
+  describe '#formatter', ->
+    it 'should format a string', ->
+      result = log.formatter
+        message: '${name} - ${level}: hi ${user}: %s'
+        user: 'Mikey'
+        level: log.levels.ERROR
+      , 'ok'
+      expect(result).to.be.equal 'test - 3: hi Mikey: ok'
+
   describe '#write', ->
     it 'should write a string', ->
       msg = 'hi here'
@@ -79,6 +104,57 @@ describe 'AbstractLogger', ->
       log.log 'hi user:%s, num:%d!', 'Mikey', 123
       expect(TestLogger::_write).to.be.calledTwice
       expect(TestLogger::_write).to.be.calledWith 'hi user:Mikey, num:123!'
+
+    it 'should log a message with level', ->
+      log.log '${name} - ${level}: hi ${user}: %s',
+        user: 'Mikey'
+        level: log.levels.ERROR
+      , 'ok'
+      expect(TestLogger::_write).to.be.calledTwice
+      expect(TestLogger::_write).to.be.calledWith 'test - ERROR: hi Mikey: ok'
+    it 'should log a message with level string', ->
+      log.log '${name} - ${level}: hi ${user}: %s',
+        user: 'Mikey'
+        level: 'ERROR'
+      , 'ok'
+      expect(TestLogger::_write).to.be.calledTwice
+      expect(TestLogger::_write).to.be.calledWith 'test - ERROR: hi Mikey: ok'
+    it 'should log a message with level via single object', ->
+      log.log
+        message: '${name} - ${level}: hi ${user}: %s %s'
+        user: 'Mikey'
+        level: log.levels.ERROR
+      , 'ok', 'world'
+      expect(TestLogger::_write).to.be.calledTwice
+      expect(TestLogger::_write).to.be.calledWith 'test - ERROR: hi Mikey: ok world'
+    it 'should mute a message with loglevel', ->
+      log.level = log.levels.ERROR-1
+      expect(log.level).to.be.equal 'CRITICAL'
+      log.log
+        message: '${name} - ${level}: hi ${user}: %s %s'
+        user: 'Mikey'
+        level: log.levels.ERROR
+      , 'ok', 'world'
+      expect(TestLogger::_write).to.not.be.called
+    it 'should mute a message with loglevel string', ->
+      log.level = log.levels.ERROR-1
+      log.log
+        message: '${name} - ${level}: hi ${user}: %s %s'
+        user: 'Mikey'
+        level: 'error'
+      , 'ok', 'world'
+      expect(TestLogger::_write).to.not.be.called
+    it 'should be silent with any loglevel string', ->
+      log.level = log.levels.SILENT
+      for k,v of log.levels
+        continue if v is -1
+        log.log
+          message: '${name} - ${level}: hi ${user}: %s %s'
+          user: 'Mikey'
+          level: k
+        , 'ok', 'world'
+      expect(TestLogger::_write).to.not.be.called
+
 
   describe '#inspect', ->
     it 'should inspect', ->

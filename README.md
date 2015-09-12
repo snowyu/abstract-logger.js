@@ -22,13 +22,39 @@ class MyLogger
   constructor: ->super
   # The `_write` method need to be overwrote.
   _write: (str)->console.error str
+```
 
+
+```js
+var logger = new MyLogger('test')
+logger.log({
+  message: '${name} - ${level}: here is a %s logging "${title}"!'
+  , title: 'Today news'
+  , level: log.levels.ERROR
+}, 'pretty')
+//or:
+logger.log('${name} - ${level}: here is a %s logging "${title}"!', {
+    title: 'Today news'
+  , level: log.levels.ERROR
+}, 'pretty')
+//result: 'test - ERROR: here is a pretty logging "Today news"'
 ```
 
 ## API
 
 * Methods:
-  * `log(message, context)`:eg, log('hi ${user}', {user:'Mikey'})
+  * `log(message[, context], args...)`:eg, log('hi ${user}', {user:'Mikey'})
+    * message *(String)*: The message to show up
+    * context *(Object)*: The optional context to escape the message against and pass the options to the log:
+      * level *(Number|String)*: the logLevel. it will be translated to the string if it's a number
+      * label *(String)*: the status label.
+      * name *(String)*: the logger name if exists.
+  * `log(context, args...)`:eg, log({message:'${name} - ${level}: hi ${user}', level:'info', user:'Mikey'})
+    * The context to escape the message against and pass the options to the log:
+      * message *(String)*: The message to show up
+      * level *(Number|String)*: the logLevel. it will be translated to the string if it's a number
+      * label *(String)*: the status label.
+      * name *(String)*: the logger name if exists.
   * `write(...)`: write a new-line if no arguments.
   * `writeln(...)`: Same as `log.write()` but automatically appends a `\n` at the end
     of the message.
@@ -36,16 +62,32 @@ class MyLogger
 
 ## TODO
 
-+ LogLevel
-  * 0 EMERGENCY system is unusable
-  * 1 ALERT action must be taken immediately
-  * 2 CRITICAL the system is in critical condition
-  * 3 ERROR error condition
-  * 4 WARNING warning condition
-  * 5 NOTICE a normal but significant condition
-  * 6 INFO a purely informational message
-  * 7 DEBUG messages to debug an application
 + Stream with transport (like https://github.com/winstonjs/winston)
+
+## Changes
+
+### v0.2
+
++ `enabled` *(Boolean)*: enable/disable the logger. default to true.
++ `levels` *(LogLevels)*: customizable logging levels
+  + The default LogLevels:
+    * SILENT:-1
+    * EMERGENCY:0 system is unusable
+    * ALERT:1     action must be taken immediately
+    * CRITICAL:2  the system is in critical condition
+    * ERROR:3     error condition
+    * WARNING:4   warning condition
+    * NOTICE:5    a normal but significant condition
+    * INFO:6      a purely informational message
+    * DEBUG:7     messages to debug an application
++ `level`: use the property to get/set the log level.
+  * defaults to levels.ERROR.
+  * set `'SILENT'` to mute the loglevel msg, it will still print it out if the msg without loglevel.
+  * setter *(Nubmer|String)*: set the logging level via number or string.
+  * getter *(String)*: get the logging level string, or get the level number via `_level` property.
+* `log()`
+  + level, name options to context.
+  + log(context, args...)
 
 ## License
 
