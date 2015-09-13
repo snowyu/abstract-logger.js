@@ -123,10 +123,10 @@ describe 'AbstractLogger', ->
     it 'should log a message with level string', ->
       log.log '${name} - ${level}: hi ${user}: %s',
         user: 'Mikey'
-        level: 'ERROR'
+        level: 'error'
       , 'ok'
       expect(TestLogger::_write).to.be.calledTwice
-      expect(TestLogger::_write).to.be.calledWith 'test - ERROR: hi Mikey: ok'
+      expect(TestLogger::_write).to.be.calledWith 'test - error: hi Mikey: ok'
     it 'should log a message with level via single object', ->
       log.log
         message: '${name} - ${level}: hi ${user}: %s %s'

@@ -69,7 +69,7 @@ module.exports = class AbstractLogger
     msg
 
   inLevel: (aLevel)->
-    aLevel = @levels[aLevel] if !isNumber aLevel
+    aLevel = @levelStr2Id(aLevel) if !isNumber aLevel
     result = isNumber(aLevel) and aLevel <= @_level
     result
   inLevelContext: (aContext)->
