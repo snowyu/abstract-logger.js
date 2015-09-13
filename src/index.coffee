@@ -52,7 +52,7 @@ module.exports = class AbstractLogger
     msg = aContext.message
     end = -1
     start = msg.indexOf('${')
-    aContext.name = @name if @name?
+    aContext.name = @name if !aContext.name? and @name?
     while start isnt -1 and end < msg.length
       end = msg.indexOf('}', start)
       end = msg.length if end is -1
