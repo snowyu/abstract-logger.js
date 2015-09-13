@@ -112,6 +112,14 @@ describe 'AbstractLogger', ->
       , 'ok'
       expect(TestLogger::_write).to.be.calledTwice
       expect(TestLogger::_write).to.be.calledWith 'test - ERROR: hi Mikey: ok'
+
+    it 'should log a message without level', ->
+      log.log '${name}: hi ${user}: %s',
+        user: 'Mikey'
+      , 'ok'
+      expect(TestLogger::_write).to.be.calledTwice
+      expect(TestLogger::_write).to.be.calledWith 'test: hi Mikey: ok'
+
     it 'should log a message with level string', ->
       log.log '${name} - ${level}: hi ${user}: %s',
         user: 'Mikey'
@@ -127,6 +135,14 @@ describe 'AbstractLogger', ->
       , 'ok', 'world'
       expect(TestLogger::_write).to.be.calledTwice
       expect(TestLogger::_write).to.be.calledWith 'test - ERROR: hi Mikey: ok world'
+    it 'should log a message without level via single object', ->
+      log.log
+        message: '${name} - ${level}: hi ${user}: %s'
+        user: 'Mikey'
+        level: 'ERROR'
+      , 'ok'
+      expect(TestLogger::_write).to.be.calledTwice
+      expect(TestLogger::_write).to.be.calledWith 'test - ERROR: hi Mikey: ok'
     it 'should mute a message with loglevel', ->
       log.level = log.levels.ERROR-1
       expect(log.level).to.be.equal 'CRITICAL'

@@ -74,8 +74,8 @@ module.exports = class AbstractLogger
     result
   inLevelContext: (aContext)->
     vLevel = aContext.level
-    result = vLevel?
-    if result
+    result = true
+    if vLevel?
       result = @inLevel vLevel
       if result and isNumber vLevel
         aContext.level = @levelId2Str vLevel
@@ -93,7 +93,7 @@ module.exports = class AbstractLogger
   log: (aContext, args...) ->
     arg2 = args[0]
     if isString(aContext) and isObject(arg2) and not isArray(arg2)
-      if !arg2.level? or @inLevelContext arg2
+      if @inLevelContext arg2
         arg2.message = aContext
         @writeln @formatter.apply(@, args)
     else if isObject(aContext) and isString(aContext.message)
