@@ -188,3 +188,8 @@ describe 'AbstractLogger', ->
       result.write()
       expect(TestLogger::_write).to.be.calledOnce
       expect(TestLogger::_write).to.be.calledWith 'a'
+
+  describe '#toJSON', ->
+    it 'should JSON.stringify a logger object', ->
+      result = JSON.stringify log
+      expect(result).to.be.equal '{"level":"ERROR","enabled":true}'

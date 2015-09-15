@@ -122,7 +122,10 @@ module.exports = class AbstractLogger
   _inspect: ->
     result = if @name then '"' + @name + '"' else ''
   inspect: ->
-    result = @Class.name || @constructor.name
+    result = @Class || @constructor
+    result = result.name
     vAttrs = @_inspect()
     result += ' ' + vAttrs if vAttrs
     '<' + result + '>'
+  toObject: ->level:@level, enabled: @enabled isnt false
+  toJSON: ->@toObject()
