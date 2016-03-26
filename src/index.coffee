@@ -24,6 +24,27 @@ module.exports = class AbstractLogger
 
   NEWLINE: '\n'
 
+  (->
+    for k, id of logLevels
+      continue if id < 0
+      AbstractLogger::[k.toLowerCase()] = ((aLevelId)->
+        return (aContext, args...)->
+          arg2 = args[0]
+          if isString(aContext) and isObject(arg2) and not isArray(arg2)
+            arg2.level = aLevelId
+            if @inLevelContext arg2
+              arg2.message = aContext
+              @writeln @formatter.apply(@, args)
+          else if isObject(aContext) and isString(aContext.message)
+            aContext.level = aLevelId
+            if @inLevelContext aContext
+              @writeln @formatter.apply(@, arguments)
+          else if @inLevel aLevelId
+            @writeln.apply @, arguments
+          @
+      )(id)
+  )()
+
   levels: logLevels
   defineProperty @::, '_level', logLevels.ERROR
   defineProperty @::, 'level', undefined,

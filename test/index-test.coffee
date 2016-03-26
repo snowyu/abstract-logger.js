@@ -193,3 +193,34 @@ describe 'AbstractLogger', ->
     it 'should JSON.stringify a logger object', ->
       result = JSON.stringify log
       expect(result).to.be.equal '{"level":"ERROR","enabled":true}'
+
+  for k, id of log.levels
+    continue if id is -1
+    ( (act, aId)->
+      describe '#'+act, ->
+        beforeEach -> log.level = aId
+        it 'should log message, context', ->
+          log[act] 'hi ${    user }! ${user}. ${no', user:'Mikey'
+          expect(TestLogger::_write).to.be.calledTwice
+          expect(TestLogger::_write).to.be.calledWith 'hi Mikey! Mikey. ${no'
+
+        it 'should log multi arguments', ->
+          log[act] 'hi user:%s, num:%d!', 'Mikey', 123
+          expect(TestLogger::_write).to.be.calledTwice
+          expect(TestLogger::_write).to.be.calledWith 'hi user:Mikey, num:123!'
+
+        it 'should log a message with level', ->
+          log[act] '${name} - ${level}: hi ${user}: %s',
+            user: 'Mikey'
+          , 'ok'
+          expect(TestLogger::_write).to.be.calledTwice
+          expect(TestLogger::_write).to.be.calledWith 'test - '+act.toUpperCase()+': hi Mikey: ok'
+        it 'should log a message with level via single object', ->
+          log[act]
+            message: '${name} - ${level}: hi ${user}: %s %s'
+            user: 'Mikey'
+          , 'ok', 'world'
+          expect(TestLogger::_write).to.be.calledTwice
+          expect(TestLogger::_write).to.be.calledWith 'test - '+act.toUpperCase()+': hi Mikey: ok world'
+
+    )(k.toLowerCase(), id)
