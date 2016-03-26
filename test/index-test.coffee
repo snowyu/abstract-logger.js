@@ -199,6 +199,11 @@ describe 'AbstractLogger', ->
     ( (act, aId)->
       describe '#'+act, ->
         beforeEach -> log.level = aId
+        it 'should log message', ->
+          log[act] 'hi world', 'ok'
+          expect(TestLogger::_write).to.be.calledTwice
+          expect(TestLogger::_write).to.be.calledWith 'hi world ok'
+
         it 'should log message, context', ->
           log[act] 'hi ${    user }! ${user}. ${no', user:'Mikey'
           expect(TestLogger::_write).to.be.calledTwice
