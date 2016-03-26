@@ -58,6 +58,8 @@ logger.log('${name} - ${level}: here is a %s logging "${title}"!', {
   * `write(...)`: write a new-line if no arguments.
   * `writeln(...)`: Same as `log.write()` but automatically appends a `\n` at the end
     of the message.
+  * `emergency/alert/critical/error/warning/notice/info/debug/trace(message[, context], args...)`:
+    * log the specified level message.
 
 
 ## TODO
